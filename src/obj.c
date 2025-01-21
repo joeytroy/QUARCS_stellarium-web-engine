@@ -319,33 +319,33 @@ const char *obj_get_id(const obj_t *obj)
     return obj->id;
 }
 
-static int on_name(const obj_t *obj, void *user,
-                   const char *cat, const char *value)
-{
+static int on_name(const obj_t *obj, void *user, const char *cat, const char *value) {
     void (*f)(const obj_t *obj, void *user, const char *value);
     void *u;
-    int *nb;
     char buf[1024];
+
     f = USER_GET(user, 0);
     u = USER_GET(user, 1);
-    nb = USER_GET(user, 2);
+
     if (cat && *cat) {
         snprintf(buf, sizeof(buf), "%s %s", cat, value);
         f(obj, u, buf);
     } else {
         f(obj, u, value);
     }
-    nb++;
+
     return 0;
 }
 
 EMSCRIPTEN_KEEPALIVE
 int obj_get_designations(const obj_t *obj, void *user,
-                  void (*f)(const obj_t *obj, void *user, const char *dsgn))
-{
+                         void (*f)(const obj_t *obj, void *user, const char *dsgn)) {
     int nb = 0;
-    if (obj->klass->get_designations)
+
+    if (obj->klass->get_designations) {
         obj->klass->get_designations(obj, USER_PASS(f, user, &nb), on_name);
+    }
+
     return nb;
 }
 

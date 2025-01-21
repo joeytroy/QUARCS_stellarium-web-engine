@@ -25,28 +25,20 @@ local void fixedtables OF((struct inflate_state FAR *state));
    windowBits is in the range 8..15, and window is a user-supplied
    window and output buffer that is 2**windowBits bytes.
  */
-int ZEXPORT inflateBackInit_(strm, windowBits, window, version, stream_size)
-z_streamp strm;
-int windowBits;
-unsigned char FAR *window;
-const char *version;
-int stream_size;
-{
-    struct inflate_state FAR *state;
+int ZEXPORT inflateBackInit_(z_streamp strm, int windowBits, unsigned char *window, const char *version, int stream_size) {
+    struct inflate_state *state;
 
-    if (version == Z_NULL || version[0] != ZLIB_VERSION[0] ||
-        stream_size != (int)(sizeof(z_stream)))
+    if (version == NULL || version[0] != ZLIB_VERSION[0] || stream_size != (int)(sizeof(z_stream)))
         return Z_VERSION_ERROR;
-    if (strm == Z_NULL || window == Z_NULL ||
-        windowBits < 8 || windowBits > 15)
+    if (strm == NULL || window == NULL || windowBits < 8 || windowBits > 15)
         return Z_STREAM_ERROR;
-    strm->msg = Z_NULL;                 /* in case we return an error */
+    strm->msg = NULL;                 /* in case we return an error */
     if (strm->zalloc == (alloc_func)0) {
 #ifdef Z_SOLO
         return Z_STREAM_ERROR;
 #else
         strm->zalloc = zcalloc;
-        strm->opaque = (voidpf)0;
+        strm->opaque = NULL;
 #endif
     }
     if (strm->zfree == (free_func)0)
@@ -55,11 +47,10 @@ int stream_size;
 #else
     strm->zfree = zcfree;
 #endif
-    state = (struct inflate_state FAR *)ZALLOC(strm, 1,
-                                               sizeof(struct inflate_state));
-    if (state == Z_NULL) return Z_MEM_ERROR;
+    state = (struct inflate_state *)ZALLOC(strm, 1, sizeof(struct inflate_state));
+    if (state == NULL) return Z_MEM_ERROR;
     Tracev((stderr, "inflate: allocated\n"));
-    strm->state = (struct internal_state FAR *)state;
+    strm->state = (struct internal_state *)state;
     state->dmax = 32768U;
     state->wbits = (uInt)windowBits;
     state->wsize = 1U << windowBits;
@@ -79,8 +70,8 @@ int stream_size;
    used for threaded applications, since the rewriting of the tables and virgin
    may not be thread-safe.
  */
-local void fixedtables(state)
-struct inflate_state FAR *state;
+local void fixedtables(struct inflate_state FAR *state)
+
 {
 #ifdef BUILDFIXED
     static int virgin = 1;
@@ -247,13 +238,7 @@ struct inflate_state FAR *state;
    inflateBack() can also return Z_STREAM_ERROR if the input parameters
    are not correct, i.e. strm is Z_NULL or the state was not initialized.
  */
-int ZEXPORT inflateBack(strm, in, in_desc, out, out_desc)
-z_streamp strm;
-in_func in;
-void FAR *in_desc;
-out_func out;
-void FAR *out_desc;
-{
+int ZEXPORT inflateBack(z_streamp strm, in_func in, void *in_desc, out_func out, void *out_desc) {
     struct inflate_state FAR *state;
     z_const unsigned char FAR *next;    /* next input */
     unsigned char FAR *put;     /* next output */
@@ -628,9 +613,7 @@ void FAR *out_desc;
     return ret;
 }
 
-int ZEXPORT inflateBackEnd(strm)
-z_streamp strm;
-{
+int ZEXPORT inflateBackEnd(z_streamp strm) {
     if (strm == Z_NULL || strm->state == Z_NULL || strm->zfree == (free_func)0)
         return Z_STREAM_ERROR;
     ZFREE(strm, strm->state);

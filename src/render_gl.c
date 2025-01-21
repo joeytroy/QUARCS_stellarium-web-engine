@@ -2097,6 +2097,7 @@ static void set_default_fonts(renderer_t *rend)
 }
 
 #if DEBUG && defined(GL_DEBUG_OUTPUT)
+__attribute__((unused))
 static void debug_callback(GLenum source, GLenum type, GLuint id,
                            GLenum severity, GLsizei length,
                            const GLchar *message,
@@ -2133,22 +2134,22 @@ renderer_t* render_create(void)
     if (range[1] < 32)
         LOG_W("OpenGL Doesn't support large point size!");
 
-    // Enable GL debug messages.
-    #if DEBUG && defined(GL_DEBUG_OUTPUT)
+// Enable GL debug messages.
+#if DEBUG && defined(GL_DEBUG_OUTPUT) && !defined(__EMSCRIPTEN__)
     {
         LOG_D("Enable GL debug output");
         GL(glEnable(GL_DEBUG_OUTPUT));
         GL(glDebugMessageCallback(debug_callback, NULL));
         GL(glDebugMessageControl(
-                GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION,
-                0, NULL, GL_FALSE));
+            GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION,
+            0, NULL, GL_FALSE));
         // Ignore "Vertex shader in program 16 is being recompiled based on
         // GL state" messages for now.
         GL(glDebugMessageControl(
-                GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_PERFORMANCE, GL_DONT_CARE,
-                1, (const GLuint[]){131218}, GL_FALSE));
+            GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_PERFORMANCE, GL_DONT_CARE,
+            1, (const GLuint[]){131218}, GL_FALSE));
     }
-    #endif
+#endif
 
     return rend;
 }

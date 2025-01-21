@@ -118,28 +118,25 @@ static const char *ORBIT_TYPES[] = {
 };
 
 
-static void load_data(mplanets_t *mplanets, const char *data, int size)
-{
+static void load_data(mplanets_t *mplanets, const char *data, int size) {
     const char *line = NULL;
-    int r, len, line_idx = 0, flags, orbit_type, number, nb_err, nb;
+    int r, len, flags, orbit_type, number, nb_err = 0, nb = 0;
     char desig[24], name[24];
     double h, g, m, w, o, i, e, n, a, epoch;
     mplanet_t *mplanet;
     obj_t *tmp;
 
-    line_idx = 0;
-    nb_err = 0;
     while (iter_lines(data, size, &line, &len)) {
-        line_idx++;
         if (len < 160) continue;
+
         r = mpc_parse_line(line, len, &number, name, desig,
-                           &h, &g, &epoch, &m, &w, &o, &i, &e,
-                           &n, &a, &flags);
+                           &h, &g, &epoch, &m, &w, &o, &i, &e, &n, &a, &flags);
         if (r) {
             nb_err++;
             continue;
         }
-        mplanet = (void*)module_add_new(&mplanets->obj, "asteroid", NULL);
+
+        mplanet = (void *)module_add_new(&mplanets->obj, "asteroid", NULL);
         mplanet->orbit.d = epoch;
         mplanet->orbit.m = m * DD2R;
         mplanet->orbit.w = w * DD2R;
@@ -154,20 +151,24 @@ static void load_data(mplanets_t *mplanets, const char *data, int size)
         orbit_type = flags & 0x3f;
         strncpy(mplanet->obj.type, ORBIT_TYPES[orbit_type], 4);
         mplanet->mpl_number = number;
+
         if (name[0]) {
-            _Static_assert(sizeof(name) == sizeof(mplanet->name), "");
+            _Static_assert(sizeof(name) == sizeof(mplanet->name), "Size mismatch");
             memcpy(mplanet->name, name, sizeof(name));
             snprintf(mplanet->model, sizeof(mplanet->model), "%d_%s",
                      mplanet->mpl_number, mplanet->name);
         }
+
         if (desig[0]) {
-            _Static_assert(sizeof(desig) == sizeof(mplanet->desig), "");
+            _Static_assert(sizeof(desig) == sizeof(mplanet->desig), "Size mismatch");
             memcpy(mplanet->desig, desig, sizeof(desig));
         }
     }
+
     if (nb_err) {
-        LOG_W("Minor planet data got %d errors lines.", nb_err);
+        LOG_W("Minor planet data got %d error lines.", nb_err);
     }
+
     DL_COUNT(mplanets->obj.children, tmp, nb);
     LOG_I("Parsed %d asteroids", nb);
 }

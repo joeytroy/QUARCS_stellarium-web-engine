@@ -1,29 +1,28 @@
-
 -include src/private/Makefile
 
 .PHONY: js
 js:
-	emscons scons -j8 mode=release
+	export EMSCRIPTEN_FLAGS="--no-modularize -Wno-unused-but-set-variable -Wno-error=unused-but-set-variable" && emscons scons -j8 mode=release
 
 .PHONY: js-debug
 js-debug:
-	emscons scons -j8 mode=debug
+	export EMSCRIPTEN_FLAGS="-Wno-unused-but-set-variable -Wno-error=unused-but-set-variable" && emscons scons -j8 mode=debug
 
 .PHONY: js-prof
 js-prof:
-	emscons scons -j8 mode=profile
+	export EMSCRIPTEN_FLAGS="-Wno-unused-but-set-variable -Wno-error=unused-but-set-variable" && emscons scons -j8 mode=profile
 
 .PHONY: js-es6
 js-es6:
-	emscons scons -j8 mode=release es6=1
-  
+	export EMSCRIPTEN_FLAGS="--no-modularize -Wno-unused-but-set-variable -Wno-error=unused-but-set-variable" && emscons scons -j8 mode=release es6=1
+
 .PHONY: js-es6-debug
 js-es6-debug:
-	emscons scons -j8 mode=debug es6=1
+	export EMSCRIPTEN_FLAGS="-Wno-unused-but-set-variable -Wno-error=unused-but-set-variable" && emscons scons -j8 mode=debug es6=1
 
 .PHONY: js-es6-prof
 js-es6-prof:
-	emscons scons -j8 mode=profile es6=1
+	export EMSCRIPTEN_FLAGS="-Wno-unused-but-set-variable -Wno-error=unused-but-set-variable" && emscons scons -j8 mode=profile es6=1
 
 # Make the doc using natualdocs.  On debian, we only have an old version
 # of naturaldocs available, where it is not possible to exclude files by

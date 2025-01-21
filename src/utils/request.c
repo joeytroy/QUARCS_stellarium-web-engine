@@ -7,13 +7,12 @@
  * repository.
  */
 
-#ifndef NO_LIBCURL
+#ifndef __EMSCRIPTEN__
 
 #include "request.h"
 #include "utstring.h"
-
 #include <assert.h>
-#include <curl/curl.h>
+#include </usr/include/aarch64-linux-gnu/curl/curl.h>
 #include <errno.h>
 #include <regex.h>
 #include <stdbool.h>

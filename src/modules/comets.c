@@ -161,10 +161,9 @@ static int comet_init(obj_t *obj, json_value *args)
 }
 
 static int load_data_mpc(comets_t *comets, const char *data, int size,
-                         double *last_epoch)
-{
+                         double *last_epoch) {
     comet_t *comet;
-    int num, nb_err = 0, len, line_idx = 0, r, nb;
+    int num, nb_err = 0, len, r, nb;
     double peri_time, peri_dist, e, peri, node, i, epoch, h, g;
     const char *line = NULL;
     char orbit_type;
@@ -172,16 +171,16 @@ static int load_data_mpc(comets_t *comets, const char *data, int size,
     obj_t *tmp;
 
     while (iter_lines(data, size, &line, &len)) {
-        line_idx++;
         r = mpc_parse_comet_line(
-                line, len, &num, &orbit_type, &peri_time, &peri_dist, &e,
-                &peri, &node, &i, &epoch, &h, &g, desgn);
+            line, len, &num, &orbit_type, &peri_time, &peri_dist, &e,
+            &peri, &node, &i, &epoch, &h, &g, desgn);
+
         if (r) {
             nb_err++;
             continue;
         }
 
-        comet = (void*)module_add_new(&comets->obj, "mpc_comet", NULL);
+        comet = (void *)module_add_new(&comets->obj, "mpc_comet", NULL);
         comet->num = num;
         comet->h = h;
         comet->g = g;
@@ -197,9 +196,9 @@ static int load_data_mpc(comets_t *comets, const char *data, int size,
         *last_epoch = fmax(epoch, *last_epoch);
 
         // Check for historical comets, where we change the h and g values
-        // around a peak date.  Only support Neowise for the moment.
+        // around a peak date. Only support Neowise for the moment.
         if (strcmp(desgn, "C/2020 F3 (NEOWISE)") == 0) {
-            comet->history = (typeof(comet->history)) {
+            comet->history = (typeof(comet->history)){
                 .time = date2mjd(2020, 7, 3),
                 .duration = 30,
                 .peak_vmag = 1,
@@ -212,6 +211,7 @@ static int load_data_mpc(comets_t *comets, const char *data, int size,
     if (nb_err) {
         LOG_W("Comet data got %d error lines.", nb_err);
     }
+
     DL_COUNT(comets->obj.children, tmp, nb);
     return nb;
 }
