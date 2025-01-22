@@ -1,6 +1,20 @@
-FROM emscripten/emsdk:1.39.17
+# Use the official EMSDK Docker image for ARM64
+FROM emscripten/emsdk:3.1.64-arm64
 
-RUN apt-get update && apt-get install -y wget build-essential apt-transport-https scons
+# Install additional dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    build-essential \
+    apt-transport-https \
+    scons \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Set EMSDK environment variables
+ENV PATH="/emsdk:/emsdk/upstream/emscripten:$PATH"
+ENV EMSDK="/emsdk"
+
+# Set the working directory
 WORKDIR /app
 
-EXPOSE 8000
+# Ensure bash is the default entrypoint
+ENTRYPOINT ["/bin/bash", "-c"]
